@@ -1,0 +1,158 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36" version="29.6.3" pages="2">
+  <diagram id="Nkj3xbrmsCMGWVwpF0ii" name="Nível 2">
+    <mxGraphModel dx="1901" dy="991" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=0;strokeColor=none;fillColor=none;align=center;              fontSize=20;fontStyle=1;fontColor=#1a1a1a;fontSize=19;" value="C4 — Nível 2: Container Diagram — Order Service" vertex="1">
+          <mxGeometry height="40" width="900" x="290" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1" parent="1" style="text;html=0;strokeColor=none;fillColor=none;fontSize=17;fontColor=#08427b;align=left;fontStyle=1" value="Azul escuro = Person" vertex="1">
+          <mxGeometry height="20" width="150" x="60" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2" parent="1" style="text;html=0;strokeColor=none;fillColor=none;fontSize=17;fontColor=#1168bd;align=left;fontStyle=1" value="Azul = Container interno" vertex="1">
+          <mxGeometry height="20" width="150" x="60" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" parent="1" style="text;html=0;strokeColor=none;fillColor=none;fontSize=17;fontColor=#666666;align=left;fontStyle=1" value="Cinza = Sistema externo" vertex="1">
+          <mxGeometry height="20" width="150" x="60" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="client" parent="1" style="rounded=1;arcSize=6;fillColor=#08427b;strokeColor=#052e56;              fontColor=#ffffff;fontSize=12;align=center;whiteSpace=wrap;              verticalAlign=middle;html=0;fontColor=light-dark(#ffffff, #ededed);" value="Client&#xa;[Person]&#xa;&#xa;Sistema ou usuário que&#xa;registra ordens via HTTP" vertex="1">
+          <mxGeometry height="130" width="180" x="80" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary" parent="1" style="rounded=1;arcSize=2;fillColor=none;strokeColor=#888888;              strokeWidth=2;dashed=1;dashPattern=10 5;html=0;" value="" vertex="1">
+          <mxGeometry height="830" width="930" x="360" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary_lbl" parent="1" style="text;html=0;strokeColor=none;fillColor=none;              fontSize=13;fontStyle=1;fontColor=#444444;align=left;" value="[ Order Service System ]" vertex="1">
+          <mxGeometry height="24" width="260" x="370" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="fastapi" parent="1" style="rounded=1;arcSize=6;fillColor=#1168bd;strokeColor=#073b6f;              fontColor=#ffffff;fontSize=12;align=center;whiteSpace=wrap;              verticalAlign=middle;html=0;fontColor=#FFFFFF;" value="FastAPI Service&#xa;[Container: Python / FastAPI]&#xa;&#xa;Expõe POST /orders.&#xa;Valida solicitante, garante&#xa;idempotência e persiste&#xa;ordem + outbox_event&#xa;em transação única." vertex="1">
+          <mxGeometry height="190" width="260" x="460" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="worker" parent="1" style="rounded=1;arcSize=6;fillColor=#1168bd;strokeColor=#073b6f;              fontColor=#ffffff;fontSize=12;align=center;whiteSpace=wrap;              verticalAlign=middle;html=0;fontColor=light-dark(#ffffff, #ededed);" value="Outbox Worker&#xa;[Container: Python / asyncio]&#xa;&#xa;Polling da outbox via&#xa;SELECT FOR UPDATE SKIP LOCKED.&#xa;Publica no SQS com retry&#xa;e exponential backoff." vertex="1">
+          <mxGeometry height="190" width="260" x="430" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="postgres" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=0;boundedLbl=1;              fillColor=#1168bd;strokeColor=#001DBC;fontColor=#ffffff;              fontSize=12;align=center;verticalAlign=middle;labelBackgroundColor=none;fillColor=#0B4D8B;" value="PostgreSQL&#xa;[Container: PostgreSQL 16]&#xa;&#xa;Tabelas orders e outbox_events.&#xa;UNIQUE em external_order_id&#xa;garante idempotência no banco." vertex="1">
+          <mxGeometry height="180" width="240" x="1010" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="sqs" parent="1" style="rounded=1;arcSize=6;fillColor=#1168bd;strokeColor=#073b6f;              fontColor=#ffffff;fontSize=12;align=center;whiteSpace=wrap;              verticalAlign=middle;html=0;fontColor=light-dark(#ffffff, #ededed);" value="Amazon SQS&#xa;[Container: AWS SQS / LocalStack]&#xa;&#xa;orders-queue para eventos.&#xa;orders-dlq para mensagens&#xa;que esgotaram retries." vertex="1">
+          <mxGeometry height="170" width="260" x="930" y="730" as="geometry" />
+        </mxCell>
+        <mxCell id="requester" parent="1" style="rounded=1;arcSize=6;fillColor=#666666;strokeColor=#444444;              fontColor=#ffffff;fontSize=12;align=center;whiteSpace=wrap;              verticalAlign=middle;html=0;fontColor=#FFFFFF;" value="Requester Service&#xa;[External System]&#xa;&#xa;Microsserviço externo de&#xa;gerenciamento de solicitantes.&#xa;Consultado via&#xa;GET /requesters/{id}" vertex="1">
+          <mxGeometry height="180" width="260" x="30" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="secrets" parent="1" style="rounded=1;arcSize=6;fillColor=#666666;strokeColor=#444444;              fontColor=#ffffff;fontSize=12;align=center;whiteSpace=wrap;              verticalAlign=middle;html=0;fontColor=#FFFFFF;" value="AWS Secrets Manager&#xa;[External System]&#xa;&#xa;Credenciais do banco e api_key.&#xa;Carregado no startup.&#xa;Fallback para .env em dev." vertex="1">
+          <mxGeometry height="170" width="260" x="1330" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="r1" edge="1" parent="1" source="client" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#08427b;              fontColor=#08427b;fontSize=11;endArrow=block;endFill=1;" target="fastapi" value="&lt;b&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;POST /orders [HTTPS/JSON]&lt;/font&gt;&lt;/b&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r2" edge="1" parent="1" source="fastapi" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#444444;              fontColor=#444444;fontSize=11;endArrow=block;endFill=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="requester" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;&lt;b&gt;GET /requesters/{id} [HTTP/JSON]&lt;/b&gt;&lt;/font&gt;">
+          <mxGeometry relative="1" x="-0.0646" y="10" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="590" y="410" />
+              <mxPoint x="320" y="410" />
+              <mxPoint x="320" y="470" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r3" edge="1" parent="1" source="fastapi" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#1168bd;              fontColor=#1168bd;fontSize=11;endArrow=block;endFill=1;" target="postgres" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;&lt;b&gt;Persiste order + outbox_event [asyncpg]&lt;/b&gt;&lt;/font&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r4" edge="1" parent="1" source="fastapi" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#444444;              fontColor=#444444;fontSize=11;endArrow=block;endFill=1;" target="secrets" value="&lt;b&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;Carrega secrets no startup [AWS SDK]&lt;/font&gt;&lt;/b&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r5" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#1168bd;              fontColor=#1168bd;fontSize=11;endArrow=block;endFill=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;" target="postgres" value="&lt;b&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;SELECT FOR UPDATE SKIP LOCKED [asyncpg]&lt;/font&gt;&lt;/b&gt;">
+          <mxGeometry relative="1" x="-0.0517" y="15" as="geometry">
+            <mxPoint x="1" as="offset" />
+            <mxPoint x="686" y="645" as="sourcePoint" />
+            <mxPoint x="1056.066666666667" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r6" edge="1" parent="1" source="worker" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#1168bd;              fontColor=#1168bd;fontSize=11;endArrow=block;endFill=1;" target="sqs" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;&lt;b&gt;Publica order_created [aioboto3]&lt;/b&gt;&lt;/font&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="tXKzvK5wyzAkUofSpTIp" name="Nivel 3">
+    <mxGraphModel dx="1426" dy="743" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-1" parent="1" style="text;html=0;strokeColor=none;fillColor=none;align=center;              fontSize=20;fontStyle=1;fontColor=#1a1a1a;fontSize=19;" value="C4 — Nível 3: Component Diagram — FastAPI Service" vertex="1">
+          <mxGeometry height="40" width="1000" x="110" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-2" parent="1" style="rounded=1;arcSize=2;fillColor=none;strokeColor=#888888;              strokeWidth=2;dashed=1;dashPattern=10 5;html=0;" value="" vertex="1">
+          <mxGeometry height="950" width="1060" x="70" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-3" parent="1" style="text;html=0;strokeColor=none;fillColor=none;              fontSize=13;fontStyle=1;fontColor=#444444;align=left;fontSize=13;" value="[ FastAPI Service — Container: Python / FastAPI ]" vertex="1">
+          <mxGeometry height="24" width="440" x="102" y="88" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-4" parent="1" style="rounded=1;arcSize=6;fillColor=#4a90d9;strokeColor=#2c5f8a;              fontColor=#ffffff;fontSize=12;align=center;whiteSpace=wrap;              verticalAlign=middle;html=0;" value="CorrelationIdMiddleware&#xa;[Component: Starlette Middleware]&#xa;&#xa;Gera ou propaga X-Correlation-ID.&#xa;Injeta no contexto async e nos logs&#xa;via structlog contextvars.&#xa;Coleta métricas de duração HTTP." vertex="1">
+          <mxGeometry height="170" width="280" x="250" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-5" parent="1" style="rounded=1;arcSize=6;fillColor=#4a90d9;strokeColor=#2c5f8a;              fontColor=#ffffff;fontSize=12;align=center;whiteSpace=wrap;              verticalAlign=middle;html=0;" value="OrderRouter&#xa;[Component: FastAPI APIRouter]&#xa;&#xa;Valida schema Pydantic do payload.&#xa;Despacha para OrderService.&#xa;Mapeia is_idempotent para&#xa;HTTP 200 ou 201." vertex="1">
+          <mxGeometry height="170" width="280" x="250" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-6" parent="1" style="rounded=1;arcSize=6;fillColor=#4a90d9;strokeColor=#2c5f8a;              fontColor=#ffffff;fontSize=12;align=center;whiteSpace=wrap;              verticalAlign=middle;html=0;" value="OrderService&#xa;[Component: Python class]&#xa;&#xa;Orquestra o fluxo: valida requester,&#xa;checa idempotência e persiste&#xa;ordem + outbox_event em transação&#xa;única. Trata race conditions&#xa;via IntegrityError." vertex="1">
+          <mxGeometry height="190" width="280" x="250" y="584.5" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-7" parent="1" style="rounded=1;arcSize=6;fillColor=#4a90d9;strokeColor=#2c5f8a;              fontColor=#ffffff;fontSize=12;align=center;whiteSpace=wrap;              verticalAlign=middle;html=0;" value="OrderRepository&#xa;[Component: SQLAlchemy async]&#xa;&#xa;find_by_external_id para&#xa;checagem de idempotência.&#xa;create para persistência." vertex="1">
+          <mxGeometry height="130" width="260" x="80" y="840" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-8" parent="1" style="rounded=1;arcSize=6;fillColor=#4a90d9;strokeColor=#2c5f8a;              fontColor=#ffffff;fontSize=12;align=center;whiteSpace=wrap;              verticalAlign=middle;html=0;" value="OutboxRepository&#xa;[Component: SQLAlchemy async]&#xa;&#xa;create para persistência do evento.&#xa;fetch_pending com SKIP LOCKED.&#xa;mark_processed / mark_failed." vertex="1">
+          <mxGeometry height="130" width="260" x="470" y="840" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-9" parent="1" style="rounded=1;arcSize=6;fillColor=#4a90d9;strokeColor=#2c5f8a;              fontColor=#ffffff;fontSize=12;align=center;whiteSpace=wrap;              verticalAlign=middle;html=0;" value="RequesterClient&#xa;[Component: httpx AsyncClient]&#xa;&#xa;GET /requesters/{id} com timeout&#xa;configurável. Mapeia 404 para&#xa;RequesterNotFoundException e&#xa;5xx/timeout para&#xa;ServiceUnavailableException." vertex="1">
+          <mxGeometry height="190" width="280" x="750" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-10" parent="1" style="rounded=1;arcSize=6;fillColor=#4a90d9;strokeColor=#2c5f8a;              fontColor=#ffffff;fontSize=12;align=center;whiteSpace=wrap;              verticalAlign=middle;html=0;" value="ExceptionHandlers&#xa;[Component: FastAPI handlers]&#xa;&#xa;Mapeia exceções de domínio para&#xa;HTTP status codes. Incrementa&#xa;orders_failed_total com&#xa;label error_type." vertex="1">
+          <mxGeometry height="170" width="280" x="760" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-11" parent="1" style="rounded=1;arcSize=6;fillColor=#4a90d9;strokeColor=#2c5f8a;              fontColor=#ffffff;fontSize=12;align=center;whiteSpace=wrap;              verticalAlign=middle;html=0;" value="PrometheusMetrics&#xa;[Component: prometheus-client]&#xa;&#xa;Expõe /metrics. Contadores:&#xa;orders_created_total,&#xa;orders_failed_total,&#xa;http_request_duration_seconds." vertex="1">
+          <mxGeometry height="170" width="280" x="760" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-12" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=0;boundedLbl=1;              fillColor=#1168bd;strokeColor=#073b6f;fontColor=light-dark(#ffffff, #ededed);              fontSize=12;align=center;verticalAlign=middle;fillColor=light-dark(#4a90d9, #ededed);" value="PostgreSQL&#xa;[External Container]" vertex="1">
+          <mxGeometry height="100" width="200" x="300" y="1040" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-13" parent="1" style="rounded=1;arcSize=6;fillColor=#666666;strokeColor=#444444;              fontColor=#ffffff;fontSize=12;align=center;whiteSpace=wrap;              verticalAlign=middle;html=0;" value="Requester Service&#xa;[External System]" vertex="1">
+          <mxGeometry height="100" width="220" x="1220" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-14" edge="1" parent="1" source="uxCVFWm02AGdhnOv2bi4-4" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#4a90d9;              fontColor=#333333;fontSize=12;endArrow=block;endFill=1;fontStyle=1" target="uxCVFWm02AGdhnOv2bi4-5" value="Propaga correlation_id via contextvars">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-15" edge="1" parent="1" source="uxCVFWm02AGdhnOv2bi4-5" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#4a90d9;              fontColor=#333333;fontSize=12;endArrow=block;endFill=1;fontStyle=1" target="uxCVFWm02AGdhnOv2bi4-6" value="create_order(payload, correlation_id)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-16" edge="1" parent="1" source="uxCVFWm02AGdhnOv2bi4-6" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#4a90d9;              fontColor=#333333;fontSize=12;endArrow=block;endFill=1;fontStyle=1" target="uxCVFWm02AGdhnOv2bi4-9" value="validate_requester(requester_id)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-17" edge="1" parent="1" source="uxCVFWm02AGdhnOv2bi4-6" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#4a90d9;              fontColor=#333333;fontSize=12;endArrow=block;endFill=1;fontStyle=1" target="uxCVFWm02AGdhnOv2bi4-7" value="find_by_external_id / create">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-18" edge="1" parent="1" source="uxCVFWm02AGdhnOv2bi4-6" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#4a90d9;              fontColor=#333333;fontSize=12;endArrow=block;endFill=1;fontStyle=1" target="uxCVFWm02AGdhnOv2bi4-8" value="create outbox_event">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-19" edge="1" parent="1" source="uxCVFWm02AGdhnOv2bi4-5" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#888888;              fontColor=#444444;fontSize=12;endArrow=block;endFill=1;dashed=1;fontStyle=1" target="uxCVFWm02AGdhnOv2bi4-10" value="Exceções de domínio">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-20" edge="1" parent="1" source="uxCVFWm02AGdhnOv2bi4-10" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#888888;              fontColor=#444444;fontSize=12;endArrow=block;endFill=1;fontStyle=1" target="uxCVFWm02AGdhnOv2bi4-11" value="Incrementa orders_failed_total">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-21" edge="1" parent="1" source="uxCVFWm02AGdhnOv2bi4-4" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#888888;              fontColor=#444444;fontSize=12;endArrow=block;endFill=1;fontStyle=1" target="uxCVFWm02AGdhnOv2bi4-11" value="Coleta duração HTTP">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-22" edge="1" parent="1" source="uxCVFWm02AGdhnOv2bi4-7" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#1168bd;              fontColor=#1168bd;fontSize=12;endArrow=block;endFill=1;fontStyle=1" target="uxCVFWm02AGdhnOv2bi4-12" value="SQL [asyncpg]">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-23" edge="1" parent="1" source="uxCVFWm02AGdhnOv2bi4-8" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#1168bd;              fontColor=#1168bd;fontSize=12;endArrow=block;endFill=1;fontStyle=1" target="uxCVFWm02AGdhnOv2bi4-12" value="SQL [asyncpg]">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="uxCVFWm02AGdhnOv2bi4-24" edge="1" parent="1" source="uxCVFWm02AGdhnOv2bi4-9" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#888888;              fontColor=#444444;fontSize=12;endArrow=block;endFill=1;fontStyle=1" target="uxCVFWm02AGdhnOv2bi4-13" value="GET /requesters/{id} [HTTP]">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

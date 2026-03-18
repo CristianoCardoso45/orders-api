@@ -1,0 +1,104 @@
+# Docker Compose para ambiente de desenvolvimento local.
+#
+# Serviços:
+#   - postgres: banco de dados PostgreSQL 16
+#   - localstack: simula SQS e Secrets Manager da AWS
+#   - requester-mock: mock do microsserviço de solicitantes
+#   - migrate: aplica as migrations no banco de dados
+#   - fastapi-service: API principal
+#   - worker: processo separado para processar outbox
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: orders_db
+      POSTGRES_USER: orders_user
+      POSTGRES_PASSWORD: orders_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U orders_user -d orders_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  localstack:
+    image: localstack/localstack:3
+    environment:
+      - SERVICES=sqs,secretsmanager
+      - DEBUG=0
+    ports:
+      - "4566:4566"
+    volumes:
+      - ./scripts/localstack-init.sh:/etc/localstack/init/ready.d/init.sh
+    healthcheck:
+      test: ["CMD-SHELL", "awslocal sqs list-queues"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["alembic", "upgrade", "head"]
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  fastapi-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - REQUESTER_SERVICE_URL=http://requester-mock:8001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      requester-mock:
+        condition: service_started
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["python", "-m", "app.worker_main"]
+    env_file:
+      - .env
+    environment:
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - REQUESTER_SERVICE_URL=http://requester-mock:8001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  requester-mock:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["uvicorn", "mocks.requester_mock:app", "--host", "0.0.0.0", "--port", "8001"]
+    ports:
+      - "8001:8001"
+
+volumes:
+  pgdata:

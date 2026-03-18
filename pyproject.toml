@@ -1,0 +1,61 @@
+[project]
+name = "order-service"
+version = "1.0.0"
+description = "Microsserviço de registro de ordens de serviço"
+requires-python = ">=3.12"
+dependencies = [
+    # Web framework — escolhido por performance async nativa e validação Pydantic integrada
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+
+    # ORM async — SQLAlchemy 2.0 com suporte nativo a async sessions
+    "sqlalchemy[asyncio]>=2.0.0",
+    "asyncpg>=0.30.0",
+
+    # HTTP client — httpx por API limpa, timeout nativo e suporte async
+    "httpx>=0.28.0",
+
+    # AWS SDK async — aioboto3 para SQS e Secrets Manager sem bloquear event loop
+    "aioboto3>=13.0.0",
+
+    # Configuração — pydantic-settings para validação de config no startup com suporte a .env
+    "pydantic-settings>=2.0.0",
+
+    # Logs estruturados — structlog para JSON logging com processadores composáveis
+    "structlog>=24.0.0",
+
+    # Métricas — prometheus-client para expor métricas no formato Prometheus
+    "prometheus-client>=0.21.0",
+
+    # Tracing — OpenTelemetry para distributed tracing
+    "opentelemetry-api>=1.28.0",
+    "opentelemetry-sdk>=1.28.0",
+    "opentelemetry-instrumentation-fastapi>=0.49b0",
+    "opentelemetry-instrumentation-httpx>=0.49b0",
+    "opentelemetry-instrumentation-sqlalchemy>=0.49b0",
+
+    # Migrations — Alembic para versionamento de schema do banco
+    "alembic>=1.14.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "pytest-mock>=3.14.0",
+    "httpx>=0.28.0",
+    "respx>=0.21.0",
+    "testcontainers>=4.8.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
